@@ -65,7 +65,7 @@ export function validateSession(tokenId) {
     throw new Error("Session token integrity check failed.")
   }
   if (new Date(data.expires) <= new Date()) {
-    unlinkSync(filePath)  // Clean up expired session
+    try { unlinkSync(filePath) } catch { /* concurrent lock may have deleted it */ }
     throw new Error("Invalid or expired session token.")
   }
   return data  // { id, scope, created, expires }

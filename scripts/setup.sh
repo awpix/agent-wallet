@@ -4,9 +4,12 @@ set -euo pipefail
 WALLET_DIR="$HOME/.openclaw-wallet"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# 1. Install npm dependencies
+# 1. Install npm dependencies and register CLI command
 cd "$SCRIPT_DIR/.."
 npm install
+if ! npm link 2>/dev/null; then
+  echo '{"warning":"npm link failed. Run with sudo or use: node scripts/wallet-cli.js"}' >&2
+fi
 
 # 2. Create runtime directories (strict permissions)
 mkdir -p "$WALLET_DIR" && chmod 0700 "$WALLET_DIR"

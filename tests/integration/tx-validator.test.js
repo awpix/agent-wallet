@@ -158,8 +158,8 @@ describe("tx-validator", () => {
       import { validateTransaction } from "./scripts/lib/tx-validator.js";
       import { logTransaction } from "./scripts/lib/tx-logger.js";
       // Write 900 USDC of history records
-      logTransaction({ chain: "bsc", to: "${VALID_RECIPIENT}", amount: "450", asset: "USDC" });
-      logTransaction({ chain: "bsc", to: "${VALID_RECIPIENT}", amount: "450", asset: "USDC" });
+      logTransaction({ chain: "bsc", chainId: 56, to: "${VALID_RECIPIENT}", amount: "450", asset: "USDC", type: "transfer" });
+      logTransaction({ chain: "bsc", chainId: 56, to: "${VALID_RECIPIENT}", amount: "450", asset: "USDC", type: "transfer" });
       try {
         // Sending 200 more would exceed the 1000 daily limit
         await validateTransaction({

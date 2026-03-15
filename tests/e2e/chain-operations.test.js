@@ -4,7 +4,7 @@
  * Covers: chains list -> chain-info -> balance -> estimate -> receive ->
  *         history -> verify-log -> status -> token decimals -> default chain -> unknown chain
  *
- * Tests requiring network access are marked with skip: !process.env.ETH_RPC_URL
+ * Tests requiring network access are marked with skip: !process.env.BSC_RPC_URL
  */
 import { describe, it, afterEach } from "node:test"
 import assert from "node:assert/strict"
@@ -17,7 +17,7 @@ import {
   readWalletFile,
 } from "../helpers/setup.js"
 
-const HAS_RPC = !!process.env.ETH_RPC_URL
+const HAS_RPC = !!process.env.BSC_RPC_URL
 
 // ----------------------------------------------------------------
 // 1. chains command — lists all 10 configured chains
@@ -86,7 +86,7 @@ describe("balance BSC (network)", () => {
     ctx = initAndUnlock()
     const res = runCli(`balance --token ${ctx.token} --chain bsc`, {
       ...ctx.env,
-      ETH_RPC_URL: process.env.ETH_RPC_URL,
+      BSC_RPC_URL: process.env.BSC_RPC_URL,
     })
     assert.equal(res.exitCode, 0, `balance should succeed: ${res.stderr}`)
     assert.ok(res.json.balances, "should contain balances object")
@@ -104,7 +104,7 @@ describe("balance chain by ID (network)", () => {
 
   it("--chain 56 and --chain bsc return the same result", { skip: !HAS_RPC }, () => {
     ctx = initAndUnlock()
-    const envWithRpc = { ...ctx.env, ETH_RPC_URL: process.env.ETH_RPC_URL }
+    const envWithRpc = { ...ctx.env, BSC_RPC_URL: process.env.BSC_RPC_URL }
 
     const byName = runCli(`balance --token ${ctx.token} --chain bsc`, envWithRpc)
     const byId = runCli(`balance --token ${ctx.token} --chain 56`, envWithRpc)
@@ -132,7 +132,7 @@ describe("estimate native (network)", () => {
     const to = "0xdead000000000000000000000000000000000001"
     const res = runCli(
       `estimate --to ${to} --amount 0.001 --chain bsc`,
-      { ...ctx.env, ETH_RPC_URL: process.env.ETH_RPC_URL }
+      { ...ctx.env, BSC_RPC_URL: process.env.BSC_RPC_URL }
     )
     assert.equal(res.exitCode, 0, `estimate should succeed: ${res.stderr}`)
     assert.ok(res.json.direct, "should contain direct object")
@@ -153,7 +153,7 @@ describe("estimate ERC20 (network)", () => {
   it("--asset usdc gas should be higher than native transfer", { skip: !HAS_RPC }, () => {
     ctx = initAndUnlock()
     const to = "0xdead000000000000000000000000000000000001"
-    const envWithRpc = { ...ctx.env, ETH_RPC_URL: process.env.ETH_RPC_URL }
+    const envWithRpc = { ...ctx.env, BSC_RPC_URL: process.env.BSC_RPC_URL }
 
     const native = runCli(`estimate --to ${to} --amount 0.001 --chain bsc`, envWithRpc)
     const erc20 = runCli(`estimate --to ${to} --amount 1 --asset usdc --chain bsc`, envWithRpc)

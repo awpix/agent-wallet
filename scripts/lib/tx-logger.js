@@ -27,7 +27,15 @@ export function getHistory(chain, limit = 50) {
   if (!existsSync(LOG_PATH)) return []  // No logs yet — normal state for a new wallet
   const lines = readFileSync(LOG_PATH, "utf8").trim().split("\n").filter(Boolean)
   let entries = lines.map(l => JSON.parse(l))
-  if (chain) entries = entries.filter(e => e.chain === chain || e.chainId === chain)
+  if (chain) {
+    // Support filtering by: config name ("bsc"), display name ("BNB Smart Chain"), or numeric chainId (56)
+    const numChain = Number(chain)
+    entries = entries.filter(e =>
+      e.chain === chain ||
+      e.chainId === chain ||
+      (!isNaN(numChain) && e.chainId === numChain)
+    )
+  }
   return entries.slice(-limit)
 }
 
@@ -37,8 +45,9 @@ export function verifyIntegrity() {
   let prevHash = "0"
   for (const line of lines) {
     const entry = JSON.parse(line)
+    const { _prevHash: _, _hash: __, ...content } = entry
     const expected = createHash("sha256")
-      .update(prevHash + JSON.stringify({ ...entry, _prevHash: undefined, _hash: undefined }))
+      .update(prevHash + JSON.stringify(content))
       .digest("hex")
     if (entry._hash !== expected) return { valid: false, brokenAt: entry.timestamp }
     prevHash = entry._hash

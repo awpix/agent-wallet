@@ -17,9 +17,22 @@ function getPassword() {
 // --- AES-256-GCM encrypted signer cache ---
 const CACHE_DIR = join(WALLET_DIR, ".signer-cache")
 
-// Derive AES key from password via SHA-256 (not scrypt — scrypt's slowness is what we want to avoid)
+// Derive AES key from password via scrypt (N=16384, ~50ms — strong KDF but much faster than keystore's N=262144)
+// This is NOT SHA-256 — an attacker with the cache file still faces scrypt brute-force cost
+import { scryptSync } from "node:crypto"
+
+const CACHE_SALT_PATH = join(WALLET_DIR, ".signer-cache", ".salt")
+
 function deriveAesKey(password) {
-  return createHash("sha256").update(password).digest()  // 32 bytes = AES-256
+  let salt
+  if (existsSync(CACHE_SALT_PATH)) {
+    salt = readFileSync(CACHE_SALT_PATH)
+  } else {
+    salt = randomBytes(32)
+    if (!existsSync(join(WALLET_DIR, ".signer-cache"))) mkdirSync(join(WALLET_DIR, ".signer-cache"), { mode: 0o700 })
+    writeFileSync(CACHE_SALT_PATH, salt, { mode: 0o600 })
+  }
+  return scryptSync(password, salt, 32, { N: 16384, r: 8, p: 1 })  // ~50ms, 32 bytes = AES-256
 }
 
 // Write encrypted cache (called by unlockAndCache)
@@ -65,7 +78,7 @@ function readSignerCache() {
 }
 
 export function loadSigner() {
-  // 1. Try encrypted file cache (< 0.1ms, skips scrypt)
+  // 1. Try encrypted file cache (~50ms scrypt KDF, still much faster than keystore's ~1.5s)
   const cached = readSignerCache()
   if (cached) return { account: cached, cleanup: () => {} }
 
@@ -99,7 +112,10 @@ export function unlockAndCache(sessionId, expiresISO) {
 
 export function clearSignerCache() {
   if (!existsSync(CACHE_DIR)) return
-  for (const f of readdirSync(CACHE_DIR).filter(f => f.endsWith(".key"))) unlinkSync(join(CACHE_DIR, f))
+  // Remove all .key cache files and the salt (force re-derive on next unlock)
+  for (const f of readdirSync(CACHE_DIR)) {
+    try { unlinkSync(join(CACHE_DIR, f)) } catch { /* concurrent deletion is harmless */ }
+  }
 }
 
 export async function initWallet() {

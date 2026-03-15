@@ -8,7 +8,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const pkg = JSON.parse(readFileSync(join(__dirname, "..", "package.json"), "utf8"))
 
 const cli = new Command()
-cli.name("wallet-cli").version(pkg.version).description("OpenClaw EVM Wallet CLI")
+cli.name("awp-wallet").version(pkg.version).description("AWP EVM Wallet CLI")
 
 // --- Global options ---
 cli.option("--pretty", "Pretty-print JSON output")
@@ -306,7 +306,15 @@ cli.command("history")
       requireScope(opts.token, "read")
       const globalOpts = cli.opts()
       const { getHistory } = await import("./lib/tx-logger.js")
-      json(getHistory(globalOpts.chain || null, parseInt(opts.limit)))
+      // Resolve chain name to chainId for consistent filtering
+      let chainFilter = globalOpts.chain || null
+      if (chainFilter) {
+        try {
+          const chains = await getChains()
+          chainFilter = chains.resolveChainId(chainFilter)
+        } catch { /* keep original string if resolution fails */ }
+      }
+      json(getHistory(chainFilter, parseInt(opts.limit)))
     } catch (e) { fail(e.message) }
   })
 
@@ -380,6 +388,19 @@ cli.command("revoke-7702")
       const chain = await resolveChain()
       const { revokeVia7702 } = await import("./lib/eip7702.js")
       json(await revokeVia7702(opts.token, chain))
+    } catch (e) { fail(e.message) }
+  })
+
+cli.command("sign-typed-data")
+  .description("Sign typed data (EIP-712)")
+  .requiredOption("--token <token>", "Session token")
+  .requiredOption("--data <json>", "EIP-712 typed data as JSON")
+  .action(async (opts) => {
+    try {
+      const { requireScope } = await import("./lib/session.js")
+      requireScope(opts.token, "transfer")
+      const { signTypedData } = await import("./lib/signing.js")
+      json(await signTypedData(JSON.parse(opts.data)))
     } catch (e) { fail(e.message) }
   })
 

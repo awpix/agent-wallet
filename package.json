@@ -1,10 +1,17 @@
 {
-  "name": "openclaw-wallet-skill",
+  "name": "awp-wallet",
   "version": "1.0.0",
   "type": "module",
+  "bin": {
+    "awp-wallet": "./scripts/wallet-cli.js"
+  },
   "engines": {
     "node": ">=20"
   },
+  "files": [
+    "scripts/",
+    "assets/"
+  ],
   "dependencies": {
     "viem": "^2.46",
     "permissionless": "^0.3",

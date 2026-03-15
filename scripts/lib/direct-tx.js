@@ -40,7 +40,7 @@ export async function sendDirect({ to, amount, asset, chain }) {
   })
   return {
     status: "sent", mode: "direct", txHash: hash,
-    chain: chainObj.name, to, amount,
+    chain: chainObj.name, chainId, to, amount,
     asset: asset || chainObj.nativeCurrency.symbol,
     gasUsed: receipt.gasUsed.toString(),
     blockNumber: Number(receipt.blockNumber),

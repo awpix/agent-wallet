@@ -85,7 +85,7 @@ export async function sendGasless({ to, amount, asset, chain, _customCall }) {
           status: "sent", mode: "gasless",
           txHash: receipt.receipt.transactionHash,  // Actual on-chain hash
           userOpHash,
-          chain: viemChain(chainId).name, to, amount,
+          chain: viemChain(chainId).name, chainId, to, amount,
           asset: asset || viemChain(chainId).nativeCurrency.symbol,
           gasStrategy: strategy,
           smartAccount: smartAccount.address,

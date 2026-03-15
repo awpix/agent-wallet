@@ -60,7 +60,7 @@ describe("session expiry", () => {
 
     const bal = runCli(`balance --token ${ctx.token} --chain bsc`, {
       ...ctx.env,
-      ETH_RPC_URL: "https://rpc.example.com",
+      BSC_RPC_URL: "https://rpc.example.com",
     })
     assert.notEqual(bal.exitCode, 0, "should fail after expiry")
     const out = bal.stderr || bal.stdout
@@ -262,7 +262,7 @@ describe("invalid address send", () => {
     ctx = initAndUnlock()
     const res = runCli(
       `send --token ${ctx.token} --to INVALID --amount 0.01 --chain bsc --mode direct`,
-      { ...ctx.env, ETH_RPC_URL: "https://rpc.example.com" }
+      { ...ctx.env, BSC_RPC_URL: "https://rpc.example.com" }
     )
     assert.notEqual(res.exitCode, 0, "should fail")
     const out = res.stderr || res.stdout
@@ -286,7 +286,7 @@ describe("zero address rejection", () => {
     const zero = "0x0000000000000000000000000000000000000000"
     const res = runCli(
       `send --token ${ctx.token} --to ${zero} --amount 0.01 --chain bsc --mode direct`,
-      { ...ctx.env, ETH_RPC_URL: "https://rpc.example.com" }
+      { ...ctx.env, BSC_RPC_URL: "https://rpc.example.com" }
     )
     assert.notEqual(res.exitCode, 0, "should fail")
     const out = res.stderr || res.stdout
@@ -311,7 +311,7 @@ describe("per-transaction limit", () => {
     const to = "0xdead000000000000000000000000000000000001"
     const res = runCli(
       `send --token ${ctx.token} --to ${to} --amount 9999 --chain bsc --mode direct`,
-      { ...ctx.env, ETH_RPC_URL: "https://rpc.example.com" }
+      { ...ctx.env, BSC_RPC_URL: "https://rpc.example.com" }
     )
     assert.notEqual(res.exitCode, 0, "should fail")
     const out = res.stderr || res.stdout

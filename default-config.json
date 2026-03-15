@@ -3,7 +3,7 @@
   "rpcOverrides": {
     "ethereum": "https://eth-mainnet.g.alchemy.com/v2/{ALCHEMY_API_KEY}",
     "base": "https://base-mainnet.g.alchemy.com/v2/{ALCHEMY_API_KEY}",
-    "bsc": "{BSC_RPC_URL}"
+    "bsc": "https://bsc-dataseed1.binance.org"
   },
   "dailyLimits": {
     "USDC": "1000",

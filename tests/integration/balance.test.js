@@ -1,12 +1,12 @@
 /**
  * Balance query integration tests — tests scripts/lib/balance.js via CLI
- * Requires network access (BSC RPC); offline environments auto-skip when ETH_RPC_URL is not set
+ * Requires network access (BSC RPC); offline environments auto-skip when BSC_RPC_URL is not set
  */
 import { describe, it, before, after } from "node:test"
 import assert from "node:assert/strict"
 import { initAndUnlock, runCli, createTestEnv } from "../helpers/setup.js"
 
-const HAS_RPC = !!process.env.ETH_RPC_URL
+const HAS_RPC = !!process.env.BSC_RPC_URL
 
 describe("getBalance", () => {
   let ctx

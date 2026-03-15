@@ -20,10 +20,15 @@ function checkDailyLimit(amount, asset, chain, batchSpent = {}) {
   const normalizedAsset = resolvedAsset.toUpperCase()
   const limitStr = cfg.dailyLimits?.[normalizedAsset] || cfg.dailyLimits?.default
   if (!limitStr) return
-  const history = getHistory(chain)
+  // Use numeric chainId for history filtering (log entries store chainId as number)
+  const chainId = resolveChainId(chain)
+  const history = getHistory(null, Infinity)  // get ALL entries (no limit), filter by chainId below
   const since = Date.now() - 24 * 60 * 60 * 1000
   const spent = history
-    .filter(e => new Date(e.timestamp).getTime() > since && (e.asset || "").toUpperCase() === normalizedAsset)
+    .filter(e => new Date(e.timestamp).getTime() > since
+      && e.chainId === chainId
+      && (e.asset || "").toUpperCase() === normalizedAsset
+      && e.type !== "approve")  // Only accumulate transfers, not approve/revoke operations
     .reduce((sum, e) => sum + parseFloat(e.amount), 0)
   // Add the accumulated amount already validated in this batch but not yet written to the log
   const batchPending = batchSpent[normalizedAsset] || 0

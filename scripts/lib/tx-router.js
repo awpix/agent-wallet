@@ -42,7 +42,7 @@ export async function sendTransaction({ sessionToken, to, amount, asset, chain, 
     ? await sendDirect({ to, amount, asset, chain })
     : await sendGasless({ to, amount, asset, chain })
 
-  await logTransaction(result)
+  await logTransaction({ ...result, type: "transfer" })
   return result
 }
 
@@ -58,7 +58,7 @@ export async function batchTransaction({ sessionToken, operations, chain, mode }
     const result = selectedMode === "direct"
       ? await sendDirect({ to: op.to, amount: op.amount, asset: op.asset, chain })
       : await sendGasless({ to: op.to, amount: op.amount, asset: op.asset, chain })
-    await logTransaction(result)
+    await logTransaction({ ...result, type: "transfer" })
     results.push(result)
   }
   return { status: "batch_complete", results }
@@ -92,8 +92,8 @@ export async function approveToken({ sessionToken, asset, spender, amount, chain
       hash, timeout: 120_000, confirmations: 1,
     })
     const result = {
-      status: "approved", mode: "direct", txHash: hash,
-      chain: chainObj.name, asset, spender, amount,
+      type: "approve", status: "approved", mode: "direct", txHash: hash,
+      chain: chainObj.name, chainId, to: spender, asset, spender, amount,
       gasUsed: receipt.gasUsed.toString(),
       blockNumber: Number(receipt.blockNumber),
     }
@@ -101,8 +101,6 @@ export async function approveToken({ sessionToken, asset, spender, amount, chain
     return result
   } else {
     // gasless approve: construct approve call data and send via gasless
-    const { sendGasless } = await import("./gasless-tx.js")
-    // sendGasless accepts custom callData; construct approve call here
     const result = await sendGasless({
       to: spender, amount: "0", asset, chain,
       _customCall: {
@@ -113,7 +111,7 @@ export async function approveToken({ sessionToken, asset, spender, amount, chain
         })
       }
     })
-    const approveResult = { ...result, status: "approved", asset, spender, amount }
+    const approveResult = { ...result, type: "approve", status: "approved", to: spender, asset, spender, amount }
     await logTransaction(approveResult)
     return approveResult
   }
@@ -163,7 +161,7 @@ export async function estimateGas({ to, amount, asset, chain }) {
       estimatedGas: estimatedGas.toString(),
       gasPrice: gasPrice.toString(),
       estimatedCost: estimatedCost.toString(),
-      estimatedCostFormatted: `${Number(estimatedCost) / 1e18} ${chainObj.nativeCurrency.symbol}`,
+      estimatedCostFormatted: `${Number(estimatedCost) / (10 ** chainObj.nativeCurrency.decimals)} ${chainObj.nativeCurrency.symbol}`,
     },
     gasless: {
       available: hasKey,

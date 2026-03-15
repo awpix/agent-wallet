@@ -128,8 +128,8 @@ describe("chains — getRpcUrl (environment variable substitution)", () => {
   })
 
   it("'bsc' rpcOverrides supports environment variable substitution", () => {
-    // In config, bsc's rpcOverrides is "{ETH_RPC_URL}"
-    ctx.env.ETH_RPC_URL = "https://test-bsc-rpc.example.com"
+    // In config, bsc's rpcOverrides is "{BSC_RPC_URL}"
+    ctx.env.BSC_RPC_URL = "https://test-bsc-rpc.example.com"
     // chain-info internally calls getRpcUrl; successful execution means substitution worked
     const res = runCli("chain-info --chain bsc", ctx.env)
     assert.equal(res.exitCode, 0)
