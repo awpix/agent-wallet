@@ -13,6 +13,56 @@ Self-custodial, chain-agnostic EVM blockchain wallet for AI agents. Direct EOA t
 
 ## Install as OpenClaw Skill
 
+### One-Click Deploy
+
+```bash
+# Clone and run the installer
+git clone https://github.com/awpix/agent-wallet.git
+cd agent-wallet
+bash install.sh
+```
+
+Or with options:
+
+```bash
+bash install.sh \
+  --dir ~/awp-wallet \
+  --bsc-rpc "https://your-bsc-rpc.com" \
+  --pimlico "pm_your_api_key"
+```
+
+The installer will:
+1. Install npm dependencies
+2. Register `awp-wallet` as a global command
+3. Create runtime directory with strict permissions
+4. Generate a 48-char random wallet password
+5. Initialize the wallet and verify the full lifecycle
+
+It outputs JSON to stdout (for OpenClaw to parse) and a human-readable summary to stderr:
+
+```json
+{
+  "status": "installed",
+  "installDir": "/home/user/awp-wallet",
+  "walletDir": "/home/user/.openclaw-wallet",
+  "walletPassword": "auto-generated-48-char-password",
+  "address": "0x...",
+  "command": "awp-wallet"
+}
+```
+
+**Options:**
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--dir <path>` | `~/awp-wallet` | Installation directory |
+| `--password <pwd>` | Auto-generated | Wallet password (48-char random if omitted) |
+| `--pimlico <key>` | None | Enable gasless transactions |
+| `--bsc-rpc <url>` | Config template | Custom BSC RPC endpoint |
+| `--no-init` | Init enabled | Skip wallet creation (setup only) |
+
+### Manual Install
+
 ### Prerequisites
 
 - Node.js >= 20
