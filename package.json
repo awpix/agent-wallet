@@ -1,0 +1,14 @@
+{
+  "name": "openclaw-wallet-skill",
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "viem": "^2.46",
+    "permissionless": "^0.3",
+    "ethers": "^6.13",
+    "commander": "^12.0"
+  }
+}
