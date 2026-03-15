@@ -11,24 +11,129 @@ Self-custodial, chain-agnostic EVM blockchain wallet for AI agents. Direct EOA t
 - **27 CLI commands** — Send, balance, approve, revoke, sign, estimate, batch, and more
 - **144 tests** — Integration + E2E, 0 failures
 
-## Quick Start
+## Install as OpenClaw Skill
+
+### Prerequisites
+
+- Node.js >= 20
+- npm >= 9
+- Git
+
+### Step 1: Clone and install
+
+```bash
+git clone https://github.com/awpix/agent-wallet.git
+cd agent-wallet
+bash scripts/setup.sh
+```
+
+This will:
+- Install 4 npm dependencies (viem, permissionless, ethers, commander)
+- Register the `awp-wallet` command globally via `npm link`
+- Create the runtime directory `~/.openclaw-wallet/` with strict permissions (0o700)
+- Copy the default chain config (10 chains, 3 bundler providers)
+- Generate a 32-byte HMAC session secret
+
+### Step 2: Configure secrets in OpenClaw
+
+OpenClaw must store these secrets in its **encrypted secret store** (never plaintext):
+
+```bash
+# Generate a strong random wallet password (do this once per agent)
+WALLET_PASSWORD=$(openssl rand -base64 36)
+
+# Store in OpenClaw's secret manager:
+openclaw secrets set WALLET_PASSWORD "$WALLET_PASSWORD"
+
+# Optional: enable gasless transactions
+openclaw secrets set PIMLICO_API_KEY "pm_xxx"
+
+# Optional: custom BSC RPC (faster than public)
+openclaw secrets set BSC_RPC_URL "https://your-bsc-rpc.com"
+```
+
+### Step 3: Initialize wallet
+
+```bash
+# OpenClaw injects WALLET_PASSWORD from its secret store
+WALLET_PASSWORD="$SECRET" awp-wallet init
+# => { "status": "created", "address": "0x..." }
+```
+
+### Step 4: Register skill in OpenClaw
+
+Point OpenClaw to the `SKILL.md` file so the agent knows when and how to use the wallet:
+
+```bash
+openclaw skills add ./agent-wallet/SKILL.md
+```
+
+OpenClaw reads the YAML frontmatter in `SKILL.md` to understand the skill's name, description, and trigger conditions.
+
+### Step 5: Verify
+
+```bash
+# Test the full lifecycle
+WALLET_PASSWORD="$SECRET" awp-wallet unlock --duration 60
+# => { "sessionToken": "wlt_...", "expires": "..." }
+
+awp-wallet balance --token wlt_... --chain bsc
+# => { "chain": "BNB Smart Chain", "chainId": 56, "balances": { "BNB": "0", ... } }
+
+awp-wallet lock
+# => { "status": "locked" }
+```
+
+### How OpenClaw Calls the Skill
+
+Once installed, the agent invokes wallet commands as subprocess calls:
+
+```
+OpenClaw Agent
+  │
+  │  User: "Send 50 USDC to 0xBob on Base"
+  │
+  ├─ 1. WALLET_PASSWORD="$SECRET" awp-wallet unlock --duration 300
+  │     → { "sessionToken": "wlt_abc..." }
+  │
+  ├─ 2. WALLET_PASSWORD="$SECRET" awp-wallet send \
+  │       --token wlt_abc --to 0xBob --amount 50 --asset usdc --chain base
+  │     → { "status": "sent", "txHash": "0x...", "mode": "direct", ... }
+  │
+  └─ 3. awp-wallet lock
+        → { "status": "locked" }
+```
+
+Each command is an independent process. The agent only sees JSON output and session tokens — **never** private keys.
+
+### Updating
+
+```bash
+cd agent-wallet
+git pull
+npm install
+```
+
+No migration needed — the runtime directory (`~/.openclaw-wallet/`) and keystore are preserved across updates.
+
+## Quick Start (Standalone)
 
 ```bash
 # Install
 bash scripts/setup.sh
 
 # Create wallet
-WALLET_PASSWORD="$SECRET" awp-wallet init
+WALLET_PASSWORD="your-password" awp-wallet init
 
 # Unlock (get session token)
-WALLET_PASSWORD="$SECRET" awp-wallet unlock --duration 3600
+WALLET_PASSWORD="your-password" awp-wallet unlock --duration 3600
 # => { "sessionToken": "wlt_abc123...", "expires": "..." }
 
 # Check balance
 awp-wallet balance --token wlt_abc123 --chain bsc
 
 # Send tokens
-WALLET_PASSWORD="$SECRET" awp-wallet send \
+WALLET_PASSWORD="your-password" awp-wallet send \
   --token wlt_abc123 --to 0xRecipient --amount 50 --asset usdc --chain base
 
 # Lock
