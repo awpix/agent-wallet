@@ -295,6 +295,28 @@ BSC_RPC_URL="https://..." node --test tests/integration/*.test.js tests/e2e/*.te
 
 4 runtime dependencies. Node.js >= 20.
 
+## Use with Claude Code for Web3 Development
+
+To let Claude Code use this wallet when building web3 applications, add the wallet guide to your project's CLAUDE.md:
+
+```bash
+# Copy the integration guide into your web3 project
+cp agent-wallet/docs/CLAUDE-WEB3-GUIDE.md your-web3-project/
+
+# Add to your project's CLAUDE.md (pick the sections you need)
+cat agent-wallet/docs/CLAUDE-WEB3-GUIDE.md >> your-web3-project/CLAUDE.md
+```
+
+The guide provides Claude Code with:
+- Complete CLI reference with all commands and options
+- Node.js helper library (`scripts/wallet.js`) for programmatic use
+- Common patterns: balance checks, token sends, approvals, message signing
+- Contract deployment integration (Hardhat, viem)
+- Error handling patterns
+- Multi-chain development workflow
+
+See [docs/CLAUDE-WEB3-GUIDE.md](docs/CLAUDE-WEB3-GUIDE.md) for the full guide.
+
 ## License
 
 MIT
