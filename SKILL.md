@@ -39,7 +39,7 @@ awp-wallet/
 ├── package.json                    # npm package with "bin": { "awp-wallet": ... }
 ├── scripts/
 │   ├── setup.sh                    # One-click install + directory provisioning
-│   ├── wallet-cli.js               # CLI entry point (27 commands)
+│   ├── wallet-cli.js               # CLI entry point (26 commands)
 │   └── lib/
 │       ├── chains.js               # Chain registry (400+ built-in + custom)
 │       ├── keystore.js             # ethers.js encryption + AES-GCM signer cache
@@ -58,7 +58,7 @@ awp-wallet/
 │   └── default-config.json         # Default config (10 chains, 3 bundler providers)
 └── tests/
     ├── helpers/setup.js            # Isolated test environment utilities
-    ├── integration/                # 8 module-level test files (101 tests)
+    ├── integration/                # 8 module-level test files (111 tests)
     └── e2e/                        # 3 end-to-end test files (33 tests)
 ```
 
@@ -264,6 +264,7 @@ Configured in `config.json`. Enforced per-transaction and per-24h rolling window
 - Daily limits track by asset symbol and chainId
 - Approve/revoke operations do **not** count toward daily transfer limits
 - Batch operations enforce cumulative limits within the batch
+- `confirmationThreshold` in config is reserved for future use (large-amount confirmation prompts)
 
 ## Security Model
 

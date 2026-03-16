@@ -8,7 +8,7 @@ Self-custodial, chain-agnostic EVM blockchain wallet for AI agents. Direct EOA t
 - **Dual-mode transactions** — Direct EOA (default, cheapest) or gasless ERC-4337 (auto when no gas)
 - **Self-custodial** — Private keys never leave the wallet process; agents only hold session tokens
 - **10 preconfigured chains** — Ethereum, Base, BSC, Arbitrum, Optimism, Polygon, Avalanche, Fantom, + testnets
-- **27 CLI commands** — Send, balance, approve, revoke, sign, estimate, batch, and more
+- **26 CLI commands** — Send, balance, approve, revoke, sign, estimate, batch, and more
 - **144 tests** — Integration + E2E, 0 failures
 
 ## Install as OpenClaw Skill
@@ -63,13 +63,13 @@ It outputs JSON to stdout (for OpenClaw to parse) and a human-readable summary t
 
 ### Manual Install
 
-### Prerequisites
+#### Prerequisites
 
 - Node.js >= 20
 - npm >= 9
 - Git
 
-### Step 1: Clone and install
+#### Step 1: Clone and install
 
 ```bash
 git clone https://github.com/awpix/agent-wallet.git
@@ -84,7 +84,7 @@ This will:
 - Copy the default chain config (10 chains, 3 bundler providers)
 - Generate a 32-byte HMAC session secret
 
-### Step 2: Configure secrets in OpenClaw
+#### Step 2: Configure secrets in OpenClaw
 
 OpenClaw must store these secrets in its **encrypted secret store** (never plaintext):
 
@@ -102,7 +102,7 @@ openclaw secrets set PIMLICO_API_KEY "pm_xxx"
 openclaw secrets set BSC_RPC_URL "https://your-bsc-rpc.com"
 ```
 
-### Step 3: Initialize wallet
+#### Step 3: Initialize wallet
 
 ```bash
 # OpenClaw injects WALLET_PASSWORD from its secret store
@@ -110,7 +110,7 @@ WALLET_PASSWORD="$SECRET" awp-wallet init
 # => { "status": "created", "address": "0x..." }
 ```
 
-### Step 4: Register skill in OpenClaw
+#### Step 4: Register skill in OpenClaw
 
 Point OpenClaw to the `SKILL.md` file so the agent knows when and how to use the wallet:
 
@@ -120,7 +120,7 @@ openclaw skills add ./agent-wallet/SKILL.md
 
 OpenClaw reads the YAML frontmatter in `SKILL.md` to understand the skill's name, description, and trigger conditions.
 
-### Step 5: Verify
+#### Step 5: Verify
 
 ```bash
 # Test the full lifecycle
@@ -266,6 +266,7 @@ See [SKILL.md](SKILL.md) for full command reference with all options.
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `WALLET_PASSWORD` | For write ops | Keystore encryption password |
+| `NEW_WALLET_PASSWORD` | change-password only | New password for `change-password` command |
 | `PIMLICO_API_KEY` | For gasless | ERC-4337 bundler/paymaster |
 | `ALCHEMY_API_KEY` | Optional | RPC + bundler fallback |
 | `BSC_RPC_URL` | Optional | Custom BSC RPC endpoint |

@@ -186,27 +186,15 @@ awp-wallet history --token $TOKEN --chain base --limit 20
 
 The wallet doesn't have a dedicated `deploy` command. For contract deployment, use the wallet's signing capability with your deployment framework:
 
-#### With viem (recommended)
+#### With viem / Hardhat / Forge
+
+The wallet doesn't support arbitrary contract bytecode deployment via CLI (the `send` command only handles transfers). For contract deployment, export the mnemonic and use your deployment framework:
 
 ```javascript
-import { createWalletClient, http } from "viem"
-import { privateKeyToAccount } from "viem/accounts"
-import { base } from "viem/chains"
-
-// DON'T use privateKey directly — use the wallet's session-based approach instead.
-// For deployment scripts that need a walletClient, use this pattern:
-
-// Option 1: Use awp-wallet for sending, parse the tx hash
-const deployTx = wallet(
-  ["send", "--token", TOKEN, "--to", "0x0000000000000000000000000000000000000000",
-   "--amount", "0", "--chain", "base"],
-  { WALLET_PASSWORD: PW }
-)
-
-// Option 2: For complex deployment, export the private key temporarily
-// WARNING: Only do this in a secure local environment
+// Get the mnemonic from awp-wallet (use in a secure local environment only)
 const exported = wallet(["export"], { WALLET_PASSWORD: PW })
-// Use exported.mnemonic with your deployment tool (hardhat, forge, etc.)
+// exported.mnemonic = "word1 word2 ... word12"
+// Use this with your deployment framework (Hardhat, Forge, viem scripts, etc.)
 ```
 
 #### With Hardhat
