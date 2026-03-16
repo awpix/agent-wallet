@@ -100,18 +100,39 @@ Created by `setup.sh` at `~/.openclaw-wallet/`:
 
 ## Secret Management (IMPORTANT)
 
-The wallet requires a `WALLET_PASSWORD` to encrypt/decrypt the keystore. OpenClaw **must** store this password securely:
+The wallet requires a `WALLET_PASSWORD` to encrypt/decrypt the keystore.
+
+### Auto-Generation Rule
+
+**If `WALLET_PASSWORD` is not set in the environment when a command needs it, the agent MUST automatically generate one and store it — never error out or ask the user for a password.**
+
+The workflow:
+
+```
+Agent receives wallet command
+  │
+  ├── WALLET_PASSWORD already stored? → inject from secret store, proceed
+  │
+  └── WALLET_PASSWORD not set?
+        ├── Generate: openssl rand -base64 36 (48-char random)
+        ├── Store in agent's secret store (encrypted, never plaintext)
+        ├── Inject as env var for this command
+        └── Proceed — user sees no prompt, no error
+```
+
+This is critical: **the user should never see "WALLET_PASSWORD environment variable required"**. The agent handles password lifecycle transparently.
 
 ### Requirements for OpenClaw
 
-1. **Generate a strong random password** (minimum 32 characters, cryptographically random) at wallet initialization time. Do NOT let users choose weak passwords.
+1. **Auto-generate on first use**. When `WALLET_PASSWORD` is not found in the secret store and a wallet command is invoked, generate a strong random password (48 characters, cryptographically random) and store it immediately. Do NOT ask the user. Do NOT report an error.
 
    ```bash
-   # Example: generate a 48-char random password
+   # Agent does this internally, not the user
    WALLET_PASSWORD=$(openssl rand -base64 36)
+   # Store in secret store immediately
    ```
 
-2. **Store the password in OpenClaw's encrypted secret store**, never in plaintext config files, environment files, or logs. Treat `WALLET_PASSWORD` with the same security level as a database master key.
+2. **Store in encrypted secret store**, never in plaintext config files, environment files, or logs. Treat `WALLET_PASSWORD` with the same security level as a database master key.
 
 3. **Inject as environment variable only at call time**. The password must exist in the process environment only for the duration of the CLI command, never persisted to disk in plaintext.
 
@@ -123,7 +144,7 @@ The wallet requires a `WALLET_PASSWORD` to encrypt/decrypt the keystore. OpenCla
    echo "WALLET_PASSWORD=xxx" >> .env  # NEVER DO THIS
    ```
 
-4. **Never log the password**. Ensure OpenClaw's logging framework redacts `WALLET_PASSWORD` from command logs, audit trails, and error reports.
+4. **Never log the password**. Ensure the logging framework redacts `WALLET_PASSWORD` from command logs, audit trails, and error reports.
 
 5. **Rotate on compromise**. If the secret store is breached, immediately run `change-password`:
    ```bash
