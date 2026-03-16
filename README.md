@@ -11,19 +11,7 @@ Self-custodial, chain-agnostic EVM blockchain wallet for AI agents. Direct EOA t
 - **26 CLI commands** — Send, balance, approve, revoke, sign, estimate, batch, and more
 - **144 tests** — Integration + E2E, 0 failures
 
-## Install from ClawHub
-
-```bash
-clawhub install awp-wallet
-```
-
-Or search for it:
-
-```bash
-clawhub search "EVM wallet"
-```
-
-## Install Manually
+## Install
 
 ### One-Click Deploy
 
