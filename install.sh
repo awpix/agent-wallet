@@ -141,12 +141,12 @@ fi
 
 # ---------- Step 5: Update BSC RPC if provided ----------
 if [[ -n "$BSC_RPC_URL" ]]; then
-  # Update config.json rpcOverrides.bsc
-  node -e "
+  # Update config.json rpcOverrides.bsc (use env vars to prevent shell injection)
+  WALLET_DIR="$WALLET_DIR" BSC_RPC_URL="$BSC_RPC_URL" node -e "
     const fs = require('fs');
-    const cfg = JSON.parse(fs.readFileSync('$WALLET_DIR/config.json', 'utf8'));
-    cfg.rpcOverrides.bsc = '$BSC_RPC_URL';
-    fs.writeFileSync('$WALLET_DIR/config.json', JSON.stringify(cfg, null, 2));
+    const cfg = JSON.parse(fs.readFileSync(process.env.WALLET_DIR + '/config.json', 'utf8'));
+    cfg.rpcOverrides.bsc = process.env.BSC_RPC_URL;
+    fs.writeFileSync(process.env.WALLET_DIR + '/config.json', JSON.stringify(cfg, null, 2));
   "
   log "BSC RPC configured"
 fi
@@ -214,6 +214,8 @@ echo -e "  ${CYAN}awp-wallet lock${NC}" >&2
 echo "" >&2
 
 # Output machine-readable JSON to stdout (for OpenClaw to parse)
+# NOTE: walletPassword is included for initial setup only — OpenClaw must store it
+# in its encrypted secret store immediately and never log this output.
 cat <<ENDJSON
 {
   "status": "installed",
@@ -223,6 +225,7 @@ cat <<ENDJSON
   "address": "${ADDRESS:-null}",
   "command": "awp-wallet",
   "pimlicoEnabled": $([ -n "$PIMLICO_API_KEY" ] && echo true || echo false),
-  "bscRpcConfigured": $([ -n "$BSC_RPC_URL" ] && echo true || echo false)
+  "bscRpcConfigured": $([ -n "$BSC_RPC_URL" ] && echo true || echo false),
+  "_warning": "Store walletPassword in your secret manager immediately. Do NOT log this output."
 }
 ENDJSON

@@ -1,4 +1,5 @@
 import { resolveChainId, publicClient, viemChain, loadConfig, getRpcUrl, tokenInfo } from "./chains.js"
+import { formatUnits } from "viem"
 import { getAddress } from "./keystore.js"
 import { sendDirect } from "./direct-tx.js"
 import { sendGasless } from "./gasless-tx.js"
@@ -161,7 +162,7 @@ export async function estimateGas({ to, amount, asset, chain }) {
       estimatedGas: estimatedGas.toString(),
       gasPrice: gasPrice.toString(),
       estimatedCost: estimatedCost.toString(),
-      estimatedCostFormatted: `${Number(estimatedCost) / (10 ** chainObj.nativeCurrency.decimals)} ${chainObj.nativeCurrency.symbol}`,
+      estimatedCostFormatted: `${formatUnits(estimatedCost, chainObj.nativeCurrency.decimals)} ${chainObj.nativeCurrency.symbol}`,
     },
     gasless: {
       available: hasKey,
