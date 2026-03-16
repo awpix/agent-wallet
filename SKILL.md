@@ -1,5 +1,5 @@
 ---
-name: wallet
+name: AWP Wallet
 description: >
   Self-custodial EVM blockchain wallet for sending tokens, checking balances,
   and managing crypto assets. Supports all EVM chains (Ethereum, Base, BSC,
@@ -7,6 +7,24 @@ description: >
   check wallet balance, sign messages, estimate gas fees, or manage token
   approvals. Supports gasless transactions via ERC-4337 when native gas is
   unavailable.
+version: 1.0.0
+metadata:
+  openclaw:
+    requires:
+      env:
+        - WALLET_PASSWORD
+      bins:
+        - node
+        - openssl
+      anyBins:
+        - npm
+    primaryEnv: WALLET_PASSWORD
+    emoji: "\U0001F4B0"
+    homepage: https://github.com/awpix/agent-wallet
+    install:
+      - kind: node
+        package: awp-wallet
+        bins: [awp-wallet]
 ---
 
 # AWP Wallet Skill

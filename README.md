@@ -11,7 +11,19 @@ Self-custodial, chain-agnostic EVM blockchain wallet for AI agents. Direct EOA t
 - **26 CLI commands** — Send, balance, approve, revoke, sign, estimate, batch, and more
 - **144 tests** — Integration + E2E, 0 failures
 
-## Install as OpenClaw Skill
+## Install from ClawHub
+
+```bash
+clawhub install awp-wallet
+```
+
+Or search for it:
+
+```bash
+clawhub search "EVM wallet"
+```
+
+## Install Manually
 
 ### One-Click Deploy
 
@@ -317,6 +329,31 @@ The guide provides Claude Code with:
 - Multi-chain development workflow
 
 See [docs/CLAUDE-WEB3-GUIDE.md](docs/CLAUDE-WEB3-GUIDE.md) for the full guide.
+
+## Publish to ClawHub
+
+```bash
+# Login (requires GitHub account, at least 1 week old)
+clawhub login
+
+# Publish
+clawhub publish . \
+  --slug awp-wallet \
+  --name "AWP Wallet" \
+  --version 1.0.0 \
+  --tags latest \
+  --changelog "Initial release: 26 commands, 10 chains, direct + gasless TX"
+```
+
+Update:
+
+```bash
+clawhub publish . \
+  --slug awp-wallet \
+  --version 1.1.0 \
+  --tags latest \
+  --changelog "Description of changes"
+```
 
 ## License
 

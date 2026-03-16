@@ -1,0 +1,11 @@
+node_modules/
+.git/
+tests/
+docs/
+*.test.js
+.env
+.env.*
+package-lock.json
+CLAUDE-CODE-INSTRUCTIONS.md
+DEV-SPEC.md
+IMPLEMENTATION-GUIDE.md
