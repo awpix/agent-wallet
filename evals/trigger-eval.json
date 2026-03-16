@@ -1,0 +1,82 @@
+[
+  {
+    "query": "I need to send 50 USDC to 0xBob on Base chain, can you handle that?",
+    "should_trigger": true
+  },
+  {
+    "query": "check how much BNB and USDT I have on BSC right now",
+    "should_trigger": true
+  },
+  {
+    "query": "hey can you sign this message with my wallet? the message is 'I agree to the terms of service for protocol XYZ' and I need the EIP-191 signature back",
+    "should_trigger": true
+  },
+  {
+    "query": "I want to approve the Uniswap router 0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD to spend up to 1000 USDC from my wallet on Ethereum mainnet",
+    "should_trigger": true
+  },
+  {
+    "query": "what's the estimated gas cost if I transfer 0.5 ETH to 0xAlice on Arbitrum?",
+    "should_trigger": true
+  },
+  {
+    "query": "show me my crypto balances across all chains — ethereum, bsc, base, polygon, everything",
+    "should_trigger": true
+  },
+  {
+    "query": "I don't have any BNB for gas but I need to send 200 USDT on BSC. is there a way to do it without paying gas?",
+    "should_trigger": true
+  },
+  {
+    "query": "can you revoke the token approval I gave to 0xSomeDefiProtocol for USDC on Base? I don't trust that contract anymore",
+    "should_trigger": true
+  },
+  {
+    "query": "I need to sign some EIP-712 typed data for a Permit2 signature. here's the typed data JSON: {\"domain\":{\"name\":\"Permit2\"...}}",
+    "should_trigger": true
+  },
+  {
+    "query": "set up a new wallet for me, I'm starting fresh and want to use it across multiple EVM chains",
+    "should_trigger": true
+  },
+  {
+    "query": "write me a Solidity smart contract for an ERC-20 token with mint and burn functions, include proper access control with OpenZeppelin",
+    "should_trigger": false
+  },
+  {
+    "query": "can you explain how the ERC-4337 EntryPoint contract works internally? I'm writing a blog post about account abstraction",
+    "should_trigger": false
+  },
+  {
+    "query": "what's the current price of ETH in USD? and show me the 7-day chart",
+    "should_trigger": false
+  },
+  {
+    "query": "I need to deploy my NFT contract to Base. here's the Solidity code in contracts/MyNFT.sol, use hardhat to deploy it",
+    "should_trigger": false
+  },
+  {
+    "query": "help me set up a React frontend that connects to MetaMask using wagmi and viem, with a button to connect wallet",
+    "should_trigger": false
+  },
+  {
+    "query": "analyze the transactions of wallet 0xWhale on Etherscan and tell me what DeFi protocols they're using",
+    "should_trigger": false
+  },
+  {
+    "query": "I want to create a Telegram bot that monitors my wallet for incoming transactions and sends me alerts",
+    "should_trigger": false
+  },
+  {
+    "query": "can you read the bytecode at 0xContractAddr on mainnet and decompile it to see what functions it has?",
+    "should_trigger": false
+  },
+  {
+    "query": "help me write a Python script that fetches historical gas prices from the Ethereum network over the past 30 days using web3.py",
+    "should_trigger": false
+  },
+  {
+    "query": "I need to set up a local Hardhat node for testing, fork mainnet at a specific block, and write some Foundry tests for my DEX aggregator contract",
+    "should_trigger": false
+  }
+]

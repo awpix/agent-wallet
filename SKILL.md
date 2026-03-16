@@ -1,12 +1,19 @@
 ---
 name: AWP Wallet
 description: >
-  Self-custodial EVM blockchain wallet for sending tokens, checking balances,
-  and managing crypto assets. Supports all EVM chains (Ethereum, Base, BSC,
-  Arbitrum, Polygon, Avalanche, etc.). Use when the user wants to send crypto,
-  check wallet balance, sign messages, estimate gas fees, or manage token
-  approvals. Supports gasless transactions via ERC-4337 when native gas is
-  unavailable.
+  Operational EVM blockchain wallet — use this skill whenever the user wants to
+  perform actual on-chain wallet operations: send tokens or native currency,
+  check wallet balance or portfolio across chains, create or initialize a new
+  wallet, sign messages (EIP-191) or typed data (EIP-712 / Permit2), estimate
+  gas fees, approve or revoke token spending allowances, or query transaction
+  status. Supports ALL EVM chains (Ethereum, Base, BSC, Arbitrum, Polygon,
+  Avalanche, Fantom, and any custom chain by ID). Automatically uses gasless
+  mode (ERC-4337) when the wallet has no native gas. Also trigger this skill
+  when the user mentions sending crypto, transferring tokens, checking their
+  crypto balance, or managing approvals — even if they don't say "wallet"
+  explicitly. Do NOT use this skill for writing smart contracts, deploying
+  contracts, blockchain data analysis, price queries, or building frontends —
+  those are development tasks, not wallet operations.
 version: 1.0.0
 metadata:
   openclaw:
