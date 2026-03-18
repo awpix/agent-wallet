@@ -31,105 +31,131 @@ metadata:
 # AWP Wallet
 
 On-chain wallet operations across all EVM blockchains via the `awp-wallet` CLI.
+All commands output JSON. `--token` in commands below refers to the session token returned by `unlock`, not a crypto token.
 
 ## Core Workflow
 
-Every interaction: **ensure wallet → unlock → execute → lock**.
-
 ```bash
+# 1. Ensure wallet exists
 awp-wallet receive 2>/dev/null || WALLET_PASSWORD="$PW" awp-wallet init
-WALLET_PASSWORD="$PW" awp-wallet unlock --duration 300
-# ... execute commands ...
+
+# 2. Unlock — this is the only step that needs WALLET_PASSWORD
+#    Returns a session token ($T) used by all subsequent commands
+WALLET_PASSWORD="$PW" awp-wallet unlock --duration 3600
+# => {"sessionToken":"wlt_abc123...","expires":"..."}
+
+# 3. Execute operations using the session token
+awp-wallet balance --token $T --chain bsc
+WALLET_PASSWORD="$PW" awp-wallet send --token $T --to 0x... --amount 0.1 --chain bsc
+
+# 4. Lock when done
 awp-wallet lock
 ```
 
-If `WALLET_PASSWORD` is not stored yet, generate it silently (`openssl rand -base64 36`), store it, and inject per-command. The user should never see a password error.
+**Password rule:** If `WALLET_PASSWORD` is not stored yet, generate it silently (`openssl rand -base64 36`), store it, and inject per-command. Never ask the user or show a password error.
 
-## Commands
+## Commands — No Token Needed
 
-### Read (session token only, no password)
+These work without `unlock`. No session token, no password:
 
 ```bash
-awp-wallet balance --token $T --chain bsc               # native + token balances
-awp-wallet balance --token $T --chain bsc --asset awp    # specific token
-awp-wallet portfolio --token $T                           # all chains
-awp-wallet estimate --to 0xAddr --amount 0.1 --chain bsc # gas cost
-awp-wallet tx-status --hash 0xHash --chain bsc           # tx status
-awp-wallet history --token $T --chain bsc                 # tx history
-awp-wallet allowances --token $T --asset usdc --chain bsc # approvals
-awp-wallet status --token $T                              # session info
-awp-wallet receive --chain bsc                            # wallet address
-awp-wallet chains                                         # list chains
-awp-wallet chain-info --chain bsc                         # chain details
-awp-wallet verify-log                                     # audit log
+awp-wallet receive                       # show wallet address
+awp-wallet receive --chain base          # show address + smart account
+awp-wallet chains                        # list preconfigured chains
+awp-wallet chain-info --chain bsc        # chain capabilities
+awp-wallet estimate --to 0x... --amount 0.1 --chain bsc   # gas cost
+awp-wallet estimate --to 0x... --amount 100 --asset usdc --chain base
+awp-wallet tx-status --hash 0x... --chain bsc              # tx status
+awp-wallet verify-log                    # audit log integrity
 ```
 
-### Write (need WALLET_PASSWORD + session token)
+## Commands — Read (need session token from `unlock`)
 
 ```bash
-# Send native (BNB/ETH)
+awp-wallet balance --token $T --chain bsc                  # all balances
+awp-wallet balance --token $T --chain bsc --asset awp      # specific token
+awp-wallet portfolio --token $T                             # all chains at once
+awp-wallet history --token $T --chain bsc                   # transaction log
+awp-wallet history --token $T --chain bsc --limit 20       # with limit
+awp-wallet allowances --token $T --asset usdc --spender 0xRouter --chain bsc
+awp-wallet status --token $T                                # address + session
+```
+
+## Commands — Write (need session token + WALLET_PASSWORD)
+
+```bash
+# Send native currency (BNB/ETH/MATIC)
 WALLET_PASSWORD="$PW" awp-wallet send --token $T --to 0xAddr --amount 0.1 --chain bsc
 
-# Send ERC-20
+# Send ERC-20 token
 WALLET_PASSWORD="$PW" awp-wallet send --token $T --to 0xAddr --amount 100 --asset usdc --chain base
 
-# Gasless send (no native gas needed)
+# Gasless send (no native gas needed, requires PIMLICO_API_KEY)
 WALLET_PASSWORD="$PW" awp-wallet send --token $T --to 0xAddr --amount 50 --asset usdc --chain base --mode gasless
 
-# Approve token spending
+# Approve token spending (for DEX/DeFi protocols)
 WALLET_PASSWORD="$PW" awp-wallet approve --token $T --asset usdc --spender 0xRouter --amount 1000 --chain base
 
-# Revoke approval
+# Revoke approval (sets allowance to 0)
 WALLET_PASSWORD="$PW" awp-wallet revoke --token $T --asset usdc --spender 0xRouter --chain base
 
 # Sign message (EIP-191)
-WALLET_PASSWORD="$PW" awp-wallet sign-message --token $T --message "Hello"
+WALLET_PASSWORD="$PW" awp-wallet sign-message --token $T --message "Hello World"
 
-# Sign typed data (EIP-712 / Permit2)
-WALLET_PASSWORD="$PW" awp-wallet sign-typed-data --token $T --data '{"domain":...}'
+# Sign typed data (EIP-712)
+WALLET_PASSWORD="$PW" awp-wallet sign-typed-data --token $T --data '{"types":{...},"primaryType":"...","domain":{...},"message":{...}}'
 
-# Batch operations
-WALLET_PASSWORD="$PW" awp-wallet batch --token $T --ops '[{"to":"0x...","amount":"10","asset":"usdc"}]' --chain base
+# Batch multiple sends
+WALLET_PASSWORD="$PW" awp-wallet batch --token $T --chain base \
+  --ops '[{"to":"0xA","amount":"10","asset":"usdc"},{"to":"0xB","amount":"20","asset":"usdc"}]'
 ```
 
-### Account Management (WALLET_PASSWORD, no session)
+## Commands — Account Management (WALLET_PASSWORD, no session)
 
 ```bash
-WALLET_PASSWORD="$PW" awp-wallet init                    # create wallet
-WALLET_PASSWORD="$PW" awp-wallet unlock --duration 3600  # get session token
-awp-wallet lock                                           # revoke sessions
-WALLET_PASSWORD="$PW" awp-wallet export                  # seed phrase
+WALLET_PASSWORD="$PW" awp-wallet init                                      # create new wallet
+WALLET_PASSWORD="$PW" awp-wallet import --mnemonic "word1 word2 ... word12" # import existing
+WALLET_PASSWORD="$PW" awp-wallet unlock --duration 3600                    # session token (1h)
+WALLET_PASSWORD="$PW" awp-wallet unlock --duration 300 --scope read        # read-only session
+awp-wallet lock                                                             # revoke all sessions
+WALLET_PASSWORD="$PW" awp-wallet export                                    # show seed phrase
 WALLET_PASSWORD="$OLD" NEW_WALLET_PASSWORD="$NEW" awp-wallet change-password
 ```
 
-## Chain & Token Selection
+## Chain & Token
 
 ```bash
---chain bsc / --chain 56 / --chain ethereum / --chain base
---chain 99999 --rpc-url https://custom.rpc.com   # custom chain
+--chain bsc          # by name (default when omitted)
+--chain 56           # by chain ID
+--chain ethereum / --chain base / --chain arbitrum / --chain polygon
+--chain 99999 --rpc-url https://custom.rpc.com    # any EVM chain
 
---asset usdc / --asset awp / --asset weth / --asset wbnb
---asset 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913  # by address
+--asset usdc / --asset usdt / --asset awp / --asset weth / --asset wbnb
+--asset 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913  # any token by address
 ```
-
-Default chain when omitted: `bsc`. AWP token is preconfigured on BSC as `awp`.
 
 ## Transaction Modes
 
-- **Direct** (default): EOA transaction, needs native gas. Cheapest.
-- **Gasless**: ERC-4337 Smart Account via paymaster. Auto-selected when no gas. Needs `PIMLICO_API_KEY`.
+- **Direct** (default): Standard EOA transaction. Needs native gas. Cheapest and fastest.
+- **Gasless** (`--mode gasless`): ERC-4337 Smart Account, paymaster pays gas. Auto-selected when wallet has no native gas. Requires `PIMLICO_API_KEY` env var.
 
 ## Error Recovery
 
 | Error | Fix |
 |-------|-----|
-| `WALLET_PASSWORD environment variable required` | Generate password, store, retry |
-| `No wallet found` | Run `awp-wallet init` |
-| `Config not found` | Run `bash scripts/setup.sh` |
-| `Invalid or expired session token` | Run `awp-wallet unlock` |
-| `Insufficient balance` | Fund wallet or use `--mode gasless` |
+| `WALLET_PASSWORD environment variable required` | Generate password, store, inject, retry |
+| `No wallet found` | `WALLET_PASSWORD="$PW" awp-wallet init` |
+| `Config not found` | `bash scripts/setup.sh` |
+| `Invalid or expired session token` | `WALLET_PASSWORD="$PW" awp-wallet unlock` |
+| `Insufficient balance for transfer + gas` | Fund wallet or `--mode gasless` |
 | `Daily limit exceeded` | Wait 24h or edit `~/.openclaw-wallet/config.json` |
+| `Amount must be a positive number` | Check amount is > 0 |
+| `Unknown chain` | Use `--chain <name|id>` or `--chain <id> --rpc-url <url>` |
 
 ## Output
 
-All JSON to stdout. Errors JSON to stderr with exit code 1. Use `--pretty` for readable output.
+All JSON to stdout. Errors JSON to stderr with exit code 1. Add `--pretty` for indented output.
+
+```json
+{"status":"sent","mode":"direct","txHash":"0x...","chain":"BNB Smart Chain","chainId":56,"to":"0x...","amount":"0.1","asset":"BNB"}
+```
