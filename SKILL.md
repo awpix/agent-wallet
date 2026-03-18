@@ -1,5 +1,5 @@
 ---
-name: AWP Wallet
+name: awp-wallet
 description: >
   Crypto wallet for AI agents — send tokens, check balances, sign messages,
   and manage approvals on any EVM blockchain. Trigger when the user wants to
@@ -8,7 +8,6 @@ description: >
   Works on Ethereum, Base, BSC, Arbitrum, Polygon, Avalanche, Optimism,
   Fantom, and any custom EVM chain. Handles gasless transactions automatically.
   Do NOT use for writing Solidity, deploying contracts, or analytics.
-version: 1.0.0
 metadata:
   openclaw:
     requires:
