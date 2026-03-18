@@ -59,30 +59,6 @@ Each command is an independent process. The agent only sees JSON output and sess
 - **26 CLI commands** — Send, balance, approve, revoke, sign, estimate, batch, and more
 - **144 tests** — Integration + E2E, 0 failures
 
-## Quick Start (Standalone)
-
-```bash
-# Install
-bash scripts/setup.sh
-
-# Create wallet
-WALLET_PASSWORD="your-password" awp-wallet init
-
-# Unlock (get session token)
-WALLET_PASSWORD="your-password" awp-wallet unlock --duration 3600
-# => { "sessionToken": "wlt_abc123...", "expires": "..." }
-
-# Check balance
-awp-wallet balance --token wlt_abc123 --chain bsc
-
-# Send tokens
-WALLET_PASSWORD="your-password" awp-wallet send \
-  --token wlt_abc123 --to 0xRecipient --amount 50 --asset usdc --chain base
-
-# Lock
-awp-wallet lock
-```
-
 ## Commands
 
 | Command | What It Does |
@@ -206,9 +182,13 @@ cd awp-wallet
 bash scripts/setup.sh
 ```
 
+This will install dependencies, register the `awp-wallet` command, create runtime directory (`~/.openclaw-wallet/`), and generate the HMAC session secret.
+
 ### One-Click Deploy
 
 ```bash
+git clone https://github.com/awp-core/awp-wallet.git
+cd awp-wallet
 bash install.sh
 ```
 
@@ -228,6 +208,27 @@ bash install.sh \
 | `--pimlico <key>` | None | Enable gasless transactions |
 | `--bsc-rpc <url>` | Config template | Custom BSC RPC endpoint |
 | `--no-init` | Init enabled | Skip wallet creation (setup only) |
+
+### Quick Start (Standalone)
+
+```bash
+# Create wallet
+WALLET_PASSWORD="your-password" awp-wallet init
+
+# Unlock (get session token)
+WALLET_PASSWORD="your-password" awp-wallet unlock --duration 3600
+# => { "sessionToken": "wlt_abc123...", "expires": "..." }
+
+# Check balance
+awp-wallet balance --token wlt_abc123 --chain bsc
+
+# Send tokens
+WALLET_PASSWORD="your-password" awp-wallet send \
+  --token wlt_abc123 --to 0xRecipient --amount 50 --asset usdc --chain base
+
+# Lock
+awp-wallet lock
+```
 
 ### Testing
 
@@ -258,7 +259,7 @@ git pull
 npm install
 ```
 
-No migration needed — the runtime directory and keystore are preserved across updates.
+No migration needed — the runtime directory (`~/.openclaw-wallet/`) and keystore are preserved across updates.
 
 ## License
 
