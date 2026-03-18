@@ -184,6 +184,10 @@
         "WBNB": {
           "address": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
           "decimals": 18
+        },
+        "AWP": {
+          "address": "0x0000969dDC625E1c084ECE9079055Fbc50F400a1",
+          "decimals": 18
         }
       }
     },
