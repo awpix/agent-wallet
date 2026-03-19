@@ -8,24 +8,11 @@ Works with OpenClaw · Claude Code · Cursor · Codex · Gemini CLI · Windsurf 
 
 ## Install as Agent Skill
 
-### OpenClaw
+Paste the repo URL in your OpenClaw conversation, or install manually:
 
 ```bash
-npx clawhub@latest install awp-wallet
-```
-
-Or paste the repo URL directly in your OpenClaw conversation:
-
-```
-https://github.com/awp-core/awp-wallet
-```
-
-### Other Skill Registries
-
-**Via [skills CLI](https://github.com/vercel-labs/skills):**
-
-```bash
-npx skills add awp-core/awp-wallet
+git clone https://github.com/awp-core/awp-wallet.git
+cd awp-wallet && bash install.sh
 ```
 
 ### How Agents Use the Wallet

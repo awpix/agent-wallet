@@ -3,7 +3,7 @@
 # AWP Wallet — One-click deployment script
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/awpix/agent-wallet/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/awp-core/awp-wallet/main/install.sh | bash
 #   # or
 #   bash install.sh [OPTIONS]
 #
@@ -23,7 +23,7 @@ WALLET_PASSWORD=""
 AUTO_INIT=true
 PIMLICO_API_KEY=""
 BSC_RPC_URL=""
-REPO_URL="https://github.com/awpix/agent-wallet.git"
+REPO_URL="https://github.com/awp-core/awp-wallet.git"
 
 # ---------- Colors (stderr only, no interference with JSON) ----------
 RED='\033[0;31m'
